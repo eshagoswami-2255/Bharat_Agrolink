@@ -1,11 +1,11 @@
 import json
 import uuid
+import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
-
-import os
-
+app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "temporary-development-key")
+
 GST_RATE = 0.18
 
 
