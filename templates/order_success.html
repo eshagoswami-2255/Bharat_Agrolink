@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Order Confirmed - Bharat Agrolink</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 820px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+    .confirmation-box {
+      border: 1px solid #2e7d32;
+      background-color: #f1f8e9;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .seller-section {
+      margin-top: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #c5e1a5;
+    }
+    .totals {
+      margin-top: 16px;
+      padding-top: 10px;
+      border-top: 1px solid #a5d6a7;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation-box">
+    <h1>Order Confirmed</h1>
+    <p>Thank you for ordering with <strong>Bharat Agrolink</strong>. Your order has been placed.</p>
+
+    <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+    <p><strong>Customer Name:</strong> {{ order.customer_name }}</p>
+    <p><strong>Mobile Number:</strong> {{ order.phone }}</p>
+    <p><strong>Delivery Address:</strong> {{ order.address }}</p>
+    <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+
+    <h2>Items Ordered (Seller-Wise)</h2>
+    {% if order.grouped_sellers %}
+      {% for seller, items in order.grouped_sellers.items() %}
+        <div class="seller-section">
+          <h3>{{ seller }}</h3>
+          <ul>
+            {% for item in items %}
+              <li>{{ item.name }} × {{ item.qty }} @ ₹{{ item.price }} = <strong>₹{{ item.line_total }}</strong></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No itemized breakdown available.</p>
+    {% endif %}
+
+    <div class="totals">
+      <p>Subtotal: <strong>₹{{ "{:,.2f}".format(order.subtotal) }}</strong></p>
+      <p>GST (18%): <strong>₹{{ "{:,.2f}".format(order.gst) }}</strong></p>
+      <p>Final Total: <strong>₹{{ "{:,.2f}".format(order.total) }}</strong></p>
+    </div>
+
+    <a class="back-link" href="/">← Back to Marketplace</a>
+  </div>
+
+  <script>
+    localStorage.removeItem("cart");
+  </script>
+</body>
+</html>

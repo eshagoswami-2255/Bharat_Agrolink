@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout - Bharat Agrolink</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 820px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+    .box {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+    .seller-group {
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #ccc;
+    }
+    .field {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .btn {
+      background-color: #2e7d32;
+      color: #fff;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .flash-msg {
+      background-color: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="/">← Back to Marketplace</a>
+  <h1>Checkout</h1>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash-msg"><strong>{{ messages[0] }}</strong></div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="box">
+    <h2>Seller-Wise Order Summary</h2>
+    {% if grouped_sellers %}
+      {% for seller, items in grouped_sellers.items() %}
+        <div class="seller-group">
+          <h3>{{ seller }}</h3>
+          <ul>
+            {% for item in items %}
+              <li>{{ item.name }} × {{ item.qty }} @ ₹{{ item.price }} = <strong>₹{{ item.line_total }}</strong></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+      <p>Subtotal: <strong>₹{{ "{:,.2f}".format(subtotal) }}</strong></p>
+      <p>GST (18%): <strong>₹{{ "{:,.2f}".format(gst) }}</strong></p>
+      <p>Final Total: <strong>₹{{ "{:,.2f}".format(total) }}</strong></p>
+    {% else %}
+      <p id="js-empty-msg">No items in server session cart yet. If you added items on the main page, submit the form below to load your saved cart or return to the marketplace.</p>
+      <div id="js-cart-preview"></div>
+    {% endif %}
+  </div>
+
+  <form class="box" method="POST" action="/checkout" onsubmit="attachLocalCart()">
+    <h2>Delivery & Payment Details</h2>
+    <input type="hidden" name="cart_data" id="cart_data_input" value="" />
+
+    <div class="field">
+      <label for="customer_name">Full Name</label>
+      <input type="text" id="customer_name" name="customer_name" required />
+    </div>
+
+    <div class="field">
+      <label for="phone">Mobile Number</label>
+      <input type="text" id="phone" name="phone" required />
+    </div>
+
+    <div class="field">
+      <label for="address">Delivery Address</label>
+      <textarea id="address" name="address" rows="3" required></textarea>
+    </div>
+
+    <div class="field">
+      <label for="payment_method">Payment Mode</label>
+      <select id="payment_method" name="payment_method">
+        <option value="UPI">UPI</option>
+        <option value="Cash on Delivery">Cash on Delivery</option>
+        <option value="Net Banking">Net Banking</option>
+      </select>
+    </div>
+
+    <button class="btn" type="submit">Place Order</button>
+  </form>
+
+  <script>
+    function attachLocalCart() {
+      const savedCart = localStorage.getItem("cart");
+      if (savedCart) {
+        document.getElementById("cart_data_input").value = savedCart;
+      }
+    }
+
+    (function renderLocalPreview() {
+      const preview = document.getElementById("js-cart-preview");
+      const emptyMsg = document.getElementById("js-empty-msg");
+      if (!preview || !emptyMsg) return;
+
+      const raw = localStorage.getItem("cart");
+      if (!raw) return;
+
+      try {
+        const parsed = JSON.parse(raw);
+        const entries = Object.entries(parsed || {}).filter(([, qty]) => Number(qty) > 0);
+        if (entries.length === 0) return;
+
+        emptyMsg.textContent = "Saved cart items detected (will calculate exact stock, seller grouping, and 18% GST upon order submission):";
+        const ul = document.createElement("ul");
+        for (const [prodId, qty] of entries) {
+          const li = document.createElement("li");
+          li.textContent = `Product ID ${prodId} × ${qty}`;
+          ul.appendChild(li);
+        }
+        preview.appendChild(ul);
+      } catch (e) {
+        // Ignore malformed localStorage value
+      }
+    })();
+  </script>
+</body>
+</html>

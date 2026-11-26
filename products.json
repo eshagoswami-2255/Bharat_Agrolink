@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Wheat Seeds",
+    "seller": "Seller A",
+    "category": "Seeds",
+    "price": 500,
+    "stock": 9,
+    "image": "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=500"
+  },
+  {
+    "id": 2,
+    "name": "Urea Fertilizer",
+    "seller": "Seller B",
+    "category": "Fertilizers",
+    "price": 300,
+    "stock": 1,
+    "image": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=500"
+  },
+  {
+    "id": 3,
+    "name": "Mustard Seeds",
+    "seller": "Seller A",
+    "category": "Seeds",
+    "price": 700,
+    "stock": 0,
+    "image": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=500"
+  }
+]
