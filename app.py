@@ -2,9 +2,10 @@ import json
 import uuid
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 
-app = Flask(__name__)
-app.secret_key = "bharat-agrolink-secret-key"
 
+import os
+
+app.secret_key = os.environ.get("SECRET_KEY", "temporary-development-key")
 GST_RATE = 0.18
 
 
